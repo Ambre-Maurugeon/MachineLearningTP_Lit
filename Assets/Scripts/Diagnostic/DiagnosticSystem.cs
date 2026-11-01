@@ -110,10 +110,10 @@ public class DiagnosticSystem {
                 value = Mathf.Lerp(0, RewardConfig.MinTargetDistance, relativeValue); // if min distance == 0 (reached target) => no reward
                 Debug.Log("Normalized minDistance: " + relativeValue + " | reward value: " + value);
                 break;
-            case REWARDS_TYPE.BAD_DIRECTION:
-                value = Mathf.Lerp(0f, RewardConfig.BadDirection, relativeValue);
-                Debug.Log("Bad direction: " + relativeValue + " | reward value: " + value);
-                break;
+            //case REWARDS_TYPE.BAD_DIRECTION:
+            //    value = Mathf.Lerp(0f, RewardConfig.BadDirection, relativeValue);
+            //    Debug.Log("Bad direction: " + relativeValue + " | reward value: " + value);
+            //    break;
             default:
                 Debug.LogWarning("Reward type not founded : " + type);
                 return;
