@@ -1,0 +1,34 @@
+# Unity runs the physics simulation every 0.01 seconds.
+# One training episode last around 1-6s, for 100-600 fixed updates.
+# Agent takes action every 2 fixed updates.
+# A full episode last at most 300 steps
+#
+# Step : The agent receives an observation and selects an action at each step, every update.
+# Experience : An experience is a transition containing observations, actions, rewards, next observations, and additionnal training data
+# Buffer : PPO collects a buffer of experiences before updating the policy.
+#
+
+behaviors:
+  PinballFlipper:
+    trainer_type: ppo
+    hyperparameters:
+      batch_size: 256 # Number of experiences to make a minibatch of experiences. Proportionnal to "Step per FixedUpdate".
+      buffer_size: 8192 # Number of experiences collected before updating the policy. Must be a multiple of "batch_size". Inversly proportionnal to Proportionnal to "Step per FixedUpdate". Proportionnal to the number of agents trained at once.
+      learning_rate: 0.0003 # Initial learning rate.  The learning rate decreases linearly during training.
+      beta: 0.003 # Strenghth of entropy bonus in the choice of actions. Encourages exploration in action space.
+      epsilon: 0.2 # PPO clipping threshold for the "new/old" policy probability ratio. Helps discourage excessively large policy updates : Clamp(new_policy / old_policy, 1 - e, 1 + e)
+      lambd: 0.99 # GAE parameter that controls the bias-variance trade-off. Basically, controls how estimated rewards in far futur impact advantage calculation. Decrease with to "FixedUpdates per Step".
+      num_epoch: 3 # Number of times the collected experience buffer is reused for training.
+      learning_rate_schedule: linear #Learning rate decrease linearly toward 0 over time to converge to a more stable solution.
+    network_settings:
+      normalize: true # Applies a normalization to observation based on average and variance of observed values.
+      hidden_units: 128 # Number of neurons in each hidden layer.
+      num_layers: 2 # Number of hidden layers.
+    reward_signals:
+      extrinsic:
+        gamma: 0.99 # Discount factor for future rewards estimated by GAE over time. Helps to match a reward to an action. Decrease with to "FixedUpdates per Step".
+        strength: 1.0 # Multiplier applied to rewards given by the environment. 
+    keep_checkpoints: 5 # Number of recent model checkpoints to retain. Checkpoints save the agent's state during training, and can be used to restore or evaluate the learning process.
+    max_steps: 600000  # Number of steps before ending training process. Proportionnal to "buffer_size".
+    time_horizon: 512 # How many experiences to collect in a trajectory. An episode is a succession of trajectory. Proportionnal to "Step per FixedUpdate". Try to cover an action and all its concequences.
+    summary_freq: 10240 # Number of experiences that needs to be collected before generating and displaying training statistics. Statistics can be visualized in TensorFlow. Must be equal to or greater than "buffer_size"
